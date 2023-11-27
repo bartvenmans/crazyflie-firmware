@@ -950,6 +950,40 @@ static void timeMemEffect(uint8_t outputBuffer[][3], bool reset)
         (1-percentShift) * currentBuffer[(i+1) % CONFIG_DECK_LEDRING_NBR_LEDS][j];
 }
 
+void nightRiderEffect(uint8_t buffer[][3], bool reset) {
+  static int position = 0;
+  static bool direction = true;
+  static uint8_t color[3] = {255, 0, 0}; // Red color
+
+  if (reset) {
+    position = 0;
+    direction = true;
+  }
+
+  // Set all LEDs to black
+  for (int i = 0; i < CONFIG_DECK_LEDRING_NBR_LEDS; i++) {
+    COPY_COLOR(buffer[i], part_black);
+  }
+
+  // Set the LED at the current position to the desired color
+  COPY_COLOR(buffer[position], color);
+
+  // Move the position based on the direction
+  if (direction) {
+    position++;
+    if (position > CONFIG_DECK_LEDRING_NBR_LEDS - 1) {
+      position = CONFIG_DECK_LEDRING_NBR_LEDS - 2;
+      direction = false;
+    }
+  } else {
+    position--;
+    if (position < 0) {
+      position = 1;
+      direction = true;
+    }
+  }
+}
+
 /**************** Effect list ***************/
 
 
@@ -974,6 +1008,7 @@ Ledring12Effect effectsFct[] =
   locSrvStatus,
   timeMemEffect,
   lighthouseEffect,
+  nightRiderEffect,
 };
 
 /********** Light signal overriding **********/
